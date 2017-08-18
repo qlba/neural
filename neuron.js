@@ -12,6 +12,20 @@ class AbstractNeuron {
 		this.W = W;
 	}
 
+	s(X) {
+		if (X.length !== this.n) {
+			throw new RangeError('Invalid input array length');
+		}
+
+		var s = this.W[this.n];
+		
+		for(var i = 0; i < this.n; i++) {
+			s += this.W[i] * X[i];
+		}
+
+		return s;
+	}
+
 	toString() {
 		return this.W.map(w => sprintf('%15.8f', w)).join(' ');
 	}
