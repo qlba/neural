@@ -1,54 +1,28 @@
 'use strict';
 
-var printf = require('./printf');
-
+var printf = require('./printf'),
+	timer = require('./timer');
 
 
 var n = 4;
+var W = (new Array(n + 1)).fill(1);
 
-var w0 = 1,
-	ws = (new Array(n)).fill(1);
-
-function adaline(xs) {
-	var s = w0;
-
-	for(var i = 0; i < n; i++) {
-		s += ws[i] * xs[i];
-	}
-
-	// return s > 0 ? 1 : -1;
-	return s;
-}
-
-function setWeights(nws) {
-	if(nws.length != n + 1) {
-		throw new Error(';fkjad[oadf[gk' + nws.length + ' ' + n + 1);
-	}
-
-	w0 = nws[0];
-	ws = nws.slice(1);
-}
 
 function train(test_data, roundsMax) {
-	var time = process.hrtime();
+	timer.reset();
 
-	printf.apply(null, [
-		' %6s %7s' + ' %10s'.repeat(n + 1) + ' %13s\n',
-		'ROUND',
-		'Q',
-		'w0'
-	].concat(
-		(new Array(n)).fill(1).map((v, i) => 'w' + (i + v))
-	).concat(['TIME']));
+	printf.apply(null, [' %6s %7s' + ' %10s'.repeat(n + 1) + ' %13s\n',
+		'ROUND', 'Q'].concat((new Array(n + 1)).fill(0).map((v, i) => 'w' + (i))).concat(['TIME']));
 
 	for(var round = 0; round < roundsMax; round++) {
+
 		var roundError = 0;
 
 		for(var set = 0; set < test_data.length; set++) {
 			var s = adaline(test_data[set].xs),
 				epsilon = test_data[set].d - s,
 				eta = 1;
-			
+
 			if(epsilon) {
 				roundError += 0.5 * epsilon * epsilon;
 
@@ -64,18 +38,9 @@ function train(test_data, roundsMax) {
 			}
 		}
 
-		var diff = process.hrtime(time);
-
 		printf.apply(null, [
 			' %6s %7.5f' + ' %10.5f'.repeat(n + 1) + ' %13.1f' + ' '.repeat(20) + '\r',
-			round,
-			roundError,
-			w0
-		].concat(
-			ws
-		).concat([
-			(diff[0] + diff[1] / 1e9)
-		]));
+			round, roundError].concat(W).concat([timer()]));
 
 		if(Math.abs(epsilon) < 0.001) {
 			break;
