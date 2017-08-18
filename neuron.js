@@ -18,7 +18,7 @@ class AbstractNeuron {
 		}
 
 		var s = this.W[this.n];
-		
+
 		for(var i = 0; i < this.n; i++) {
 			s += this.W[i] * X[i];
 		}
@@ -31,25 +31,13 @@ class AbstractNeuron {
 	}
 }
 
-class Perceptron extends AbstractNeuron {
-	constructor(n, W) {
-		super(n, W);
-	}
-
+class AbstractTresholdNeuron {
 	y(X) {
-		if (X.length !== this.n) {
-			throw new RangeError('Invalid something');
-		}
-
-		var s = this.W[this.n];
-
-		for(var i = 0; i < this.n; i++) {
-			s += this.W[i] * X[i];
-		}
-
-		return s > 0 ? 1 : -1;
+		return this.s(X) > 0 ? 1 : -1;
 	}
+}
 
+class Perceptron extends AbstractTresholdNeuron {
 	train(X, d) {
 		var y = this.y(X);
 
@@ -65,8 +53,24 @@ class Perceptron extends AbstractNeuron {
 	}
 }
 
-// class Adaline extends 
+class Adaline extends AbstractTresholdNeuron {
+	train(X, d) {
+		var y = this.y(X);
+
+		if(y !== d) {
+			this.W[this.n] += d;
+
+			for(var i = 0; i < this.n; i++) {
+				this.W[i] += d * X[i];
+			}
+		}
+
+		return y - d;
+	}
+}
 
 
-
-module.exports = {Perceptron};
+module.exports = {
+	Perceptron,
+	Adaline
+};
