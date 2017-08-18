@@ -53,7 +53,7 @@ class Perceptron extends AbstractTresholdNeuron {
 	}
 }
 
-class Adaline extends AbstractTresholdNeuron {
+class AbstractAdaline extends AbstractTresholdNeuron {
 	constructor(n, W, eta = 0.5) {
 		super(n, W);
 
@@ -63,7 +63,26 @@ class Adaline extends AbstractTresholdNeuron {
 
 		this.eta = eta;
 	}
+}
 
+class Adaline extends AbstractAdaline {
+	train(X, d) {
+		var s = this.s(X),
+			epsilon = d - s;
+		
+		var k = this.eta * epsilon;
+
+		this.W[this.n] += k;
+
+		for(var i = 0; i < this.n; i++) {
+			this.W[i] += k * X[i];
+		}
+
+		return -epsilon;
+	}
+}
+
+class AdalineRLS extends AbstractAdaline {
 	train(X, d) {
 		var s = this.s(X),
 			epsilon = d - s;
@@ -83,5 +102,6 @@ class Adaline extends AbstractTresholdNeuron {
 
 module.exports = {
 	Perceptron,
-	Adaline
+	Adaline,
+	AdalineRLS
 };
