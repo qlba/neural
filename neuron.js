@@ -31,7 +31,7 @@ class AbstractNeuron {
 	}
 }
 
-class AbstractTresholdNeuron {
+class AbstractTresholdNeuron extends AbstractNeuron {
 	y(X) {
 		return this.s(X) > 0 ? 1 : -1;
 	}
@@ -54,18 +54,29 @@ class Perceptron extends AbstractTresholdNeuron {
 }
 
 class Adaline extends AbstractTresholdNeuron {
-	train(X, d) {
-		var y = this.y(X);
+	constructor(n, W, eta = 0.5) {
+		super(n, W);
 
-		if(y !== d) {
-			this.W[this.n] += d;
-
-			for(var i = 0; i < this.n; i++) {
-				this.W[i] += d * X[i];
-			}
+		if(eta < 0) {
+			throw new RangeError('Eta cannot be negative');
 		}
 
-		return y - d;
+		this.eta = eta;
+	}
+
+	train(X, d) {
+		var s = this.s(X),
+			epsilon = d - s;
+		
+		var k = this.eta * epsilon;
+
+		this.W[this.n] += k;
+
+		for(var i = 0; i < this.n; i++) {
+			this.W[i] += k * X[i];
+		}
+
+		return -epsilon;
 	}
 }
 
